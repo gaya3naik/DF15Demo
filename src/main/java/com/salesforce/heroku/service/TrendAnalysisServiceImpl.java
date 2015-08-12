@@ -1,5 +1,7 @@
 package com.salesforce.heroku.service;
 
+import com.salesforce.heroku.db.H2DB;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +10,12 @@ import java.util.Map;
  */
 public class TrendAnalysisServiceImpl {
 
-    public static List<Map<String, Object>> getAnalyzedTrendData(String analysisType, List<Map<String, Object>>  records){
+    public static List<Map<String, Object>> getAnalyzedTrendData(String analysisType, List<Map<String, Object>>  records) throws Exception {
+
+        if("MA".equalsIgnoreCase(analysisType)){
+        return H2DB.getMovingAverages(records);
+        }
         return null;
+
     }
 }
