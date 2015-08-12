@@ -16,6 +16,7 @@ import java.util.Map;
  */
 
 @Path("trends")
+
 public class AnalyticsRestAPI {
 
     @POST

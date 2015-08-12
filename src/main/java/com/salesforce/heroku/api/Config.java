@@ -1,5 +1,6 @@
 package com.salesforce.heroku.api;
 
+import com.salesforce.heroku.filter.CORSFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -12,6 +13,7 @@ public class Config extends ResourceConfig {
 
         packages("com.salesforce.heroku");
         register(JacksonFeature.class);
+        register(CORSFilter.class);
 
     }
 
