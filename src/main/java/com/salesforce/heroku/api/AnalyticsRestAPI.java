@@ -32,7 +32,7 @@ public class AnalyticsRestAPI {
                 return records;
             }
             else{
-                 return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType);
+                 return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType, records);
             }
 
 

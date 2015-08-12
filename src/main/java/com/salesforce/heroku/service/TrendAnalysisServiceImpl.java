@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class TrendAnalysisServiceImpl {
 
-    public static List<Map<String, Object>> getAnalyzedTrendData(String analysisType){
+    public static List<Map<String, Object>> getAnalyzedTrendData(String analysisType, List<Map<String, Object>>  records){
         return null;
     }
 }
