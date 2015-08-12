@@ -1,0 +1,158 @@
+<apex:page sidebar="false" controller="SFController" >
+                    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+
+        .hashtag{
+        color: #F20930;
+        }
+
+        .tweetBlock{
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 12pt;
+        border: 1px;
+        border-style: solid;
+        border-color: #E1E8Ed;
+        background: #F5F8Fa;
+        padding-right : 15px;
+        }
+
+        .tweetDate{
+        font-size: 10pt;
+        }
+
+        #logger{
+        font-size: 12pt;
+        color: #F20930;
+        }
+
+    </style>
+<apex:form>
+                    <select onClick="prepareAndSendRequest(this.value)" >
+                     <option value="MM">Measure VS Measure</option>
+                     <option value="GM">Growth Metrics</option>
+                     <option value="MD">Multi Dimension Analytics</option>
+                   </select>
+</apex:form>
+    <script language="JavaScript">
+    function prepareAndSendRequest(type){
+        var requestObj = {};
+        requestObj.url = "https://c.na17.visual.force.com";
+        requestObj.analysisType = type;
+        requestObj.sessionId = "{!$Api.Session_ID}";
+        fetchAnalyticsData(requestObj);
+
+    }
+    function fetchAnalyticsData(requestObj){
+        j$( "#container" ).empty();
+        j$( "#logger" ).show();
+        j$( "#logger" ).text( "Loading data...");
+        initChart();
+        var analyticsData = {};
+        j$.ajax({
+            url:"https://"+appName+".herokuapp.com/trends/analysis",
+            data:requestObj,
+            context: document.body
+        }).done(function(data) {
+            analyticsData = data;
+            initChart();
+            j$( "#logger" ).hide();
+        });
+    }
+
+
+    function initChart() {
+        chart = new Highcharts.Chart({
+            chart: {
+                            renderTo : 'container'
+                        },
+           title: {
+                       text: 'Monthly Average Temperature',
+                       x: -20 //center
+                   },
+                   subtitle: {
+                       text: 'Source: WorldClimate.m',
+                       x: -20
+                   },
+                   xAxis: {
+                       categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                   },
+                   yAxis: {
+                       title: {
+                           text: 'Temperature (°C)'
+                       },
+                       plotLines: [{
+                           value: 0,
+                           width: 1,
+                           color: '#808080'
+                       }]
+                   },
+                   tooltip: {
+                       valueSuffix: '°C'
+                   },
+                   legend: {
+                       layout: 'vertical',
+                       align: 'right',
+                       verticalAlign: 'middle',
+                       borderWidth: 0
+                   },
+                   series: [{
+                       name: 'Tokyo',
+                       data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+                   }, {
+                       name: 'New York',
+                       data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
+                   }, {
+                       name: 'Berlin',
+                       data: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
+                   }, {
+                       name: 'London',
+                       data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+                   }]
+        });
+    }
+
+    function getDataFromTweetData(tweetData){
+        var returnData = new Array();
+        for(var i = tweetData.length-1; i >= 0 ; i--){
+            var dataPoint = new Array();
+            dataPoint[0] = tweetData[i].date;
+            dataPoint[1] = tweetData[i].score;
+            returnData.push(dataPoint);
+        }
+        return returnData;
+    }
+
+    function populateTweetList(){
+        for(var i = 0; i < tweetData.length; i++){
+            document.getElementById("tweetList").innerHTML += getHTMLForTweet(tweetData[i]);
+        }
+    }
+
+    function getHTMLForTweet(tweet){
+        var html ="<table width='80%' class='tweetBlock'><tr><td width='75px'><img src='https://pbs.twimg.com/profile_images/468343244804198401/MKTZ6B9f_bigger.jpeg'/></td><td><table border='0'>";
+        html += "<tr><th align='left'><a class='hashtag' href='https://www.twitter.com/@"+tweet.handle+"' target='blank'>@" + tweet.handle + "</a></th></tr>";
+        html += "<tr><td class='tweetDate'>" + new Date(tweet.date).toUTCString() + "</td></tr>";
+        html += "<tr><td>" + tweet.message.replace(/(^|\W)(#[a-z\d][\w-]*)/ig, '$1<span><a class="hashtag" href="https://www.twitter.com/$2" target="blank">$2</a></span>') + "</td></tr>";
+        html += "</table></tr></td></table><br/>";
+        return html;
+    }
+
+    j$ = jQuery.noConflict();
+    j$( document ).ajaxError(function() {
+        j$( "#logger" ).show();
+        j$( "#logger" ).text( "Error in reading data" );
+        j$( "#container" ).empty();
+    });
+    j$(document).ready(function() {
+        initializeMenu();
+    });
+
+    function initializeMenu(){
+        j$.append('');
+    }
+    </script>
+
+</apex:page>
