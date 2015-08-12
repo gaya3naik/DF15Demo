@@ -60,7 +60,7 @@ public class H2DB {
 //    }
 
     public static List<Map<String, Object>> getMovingAverages(List<Map<String, Object>> records) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MMM-DD");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-DD");
         Date date;
         Timestamp timestamp;
         DeleteDbFiles.execute("~", "#AnalyticsData1", true); // delete and then do the below
@@ -78,7 +78,7 @@ public class H2DB {
         for(Map<String, Object> record : records){
             date = formatter.parse(String.valueOf(record.get("Date__c")));
             timestamp = new Timestamp(date.getTime());
-             stat.execute("INSERT INTO #AnalyticsData VALUES({ts '"+ timestamp+ "'} ,'" +record.get("PageViews__c")+"')" );
+             stat.execute("INSERT INTO #AnalyticsData1 VALUES({ts '"+ timestamp+ "'} ,'" +record.get("PageViews__c")+"', '"+ record.get("SessionCount__c") + "')" );
         }
 
         System.out.print(" Data is inserted");
@@ -92,14 +92,12 @@ public class H2DB {
         System.out.print("result " + rs);
         List<Map<String, Object>> resultList= Lists.newArrayList();
 
-        while (rs.next()) {
-            System.out.println(rs.getDouble("avg_prev_3_days"));
-        }
+
         while (rs.next()) {
             Map<String, Object> resultMap = Maps.newHashMap();
             resultMap.put("Date__c", rs.getDate("date"));
             resultMap.put("PageViews__c", rs.getDouble("avg_pv"));
-            System.out.println(rs.getInt("avg_prev_3_days"));
+            System.out.println(rs.getDouble("avg_pv"));
             resultList.add(resultMap);
         }
         stat.close();
