@@ -60,7 +60,7 @@ public class H2DB {
 //    }
 
     public static List<Map<String, Object>> getMovingAverages(List<Map<String, Object>> records) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MMM-DD");
         Date date;
         Timestamp timestamp;
         DeleteDbFiles.execute("~", "#AnalyticsData1", true); // delete and then do the below
