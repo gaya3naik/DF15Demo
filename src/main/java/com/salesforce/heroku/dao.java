@@ -1,4 +1,4 @@
-package com.salesforce.heroku.api;
+package com.salesforce.heroku;
 
 /**
  * Created by gayathri on 11/8/15.

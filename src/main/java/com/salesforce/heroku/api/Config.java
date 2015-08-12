@@ -1,6 +1,6 @@
 package com.salesforce.heroku.api;
 
-import com.salesforce.heroku.api.filter.CORSFilter;
+import com.salesforce.heroku.filter.CORSFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 

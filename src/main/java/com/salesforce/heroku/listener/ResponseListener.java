@@ -1,4 +1,4 @@
-package com.salesforce.heroku.api.listener;
+package com.salesforce.heroku.listener;
 
 /**
  * Created by gayathri on 11/8/15.
