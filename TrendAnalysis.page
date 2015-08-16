@@ -1,14 +1,12 @@
-<apex:page sidebar="false" controller="SFController">
-    <apex:form>
-        <select onChange="prepareAndSendRequest(this.value)">
+<apex:page sidebar="false" controller="SFController" >
+    <apex:form >
+        <select onChange="prepareAndSendRequest(this.value)" >
             <option value="MM">Measure VS Measure</option>
-            <option value="MA">Moving Average</option>
+            <option value="MA">Growth Metrics</option>
             <option value="MD">Multi Dimension Analytics</option>
         </select>
     </apex:form>
-    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-    <br/>
-
+    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div> <br/>
     <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -55,7 +53,7 @@
         j$( "#logger" ).show();
         j$( "#logger" ).text( "Loading data...");
         initChart();
-        
+
         j$.ajax({
             method: "POST",
             url:"https://"+appName+".herokuapp.com/trends/analysis",
@@ -77,7 +75,7 @@
     }
 
 
-    function initChart() {        
+    function initChart() {
         j$( "#container1" ).hide();
         j$( "#container" ).show();
         chart = new Highcharts.Chart({
@@ -123,9 +121,9 @@
             data:getSessionCount(analyticsData)
         }]
     });
-        
+
     }
-    
+
     function initChart1() {
          j$( "#container" ).hide();
         j$( "#container1" ).show();
@@ -134,9 +132,9 @@
                             renderTo : 'container1',
             type:'area'
                         },
-           
+
         title: {
-            text: '% Growth of Page Views'
+            text: '% Growth of Page Views/Session Count'
         },
         xAxis: {
             type: 'datetime',
@@ -149,14 +147,14 @@
             },
             categories: getCategories(analyticsData)
         },
-        
+
         yAxis: {
             title: {
-                text: '% Growth of Page Views'
+                text: '% Growth of Page Views/Session Count'
             }
         },
             plotOptions: {
-            area: {                
+            area: {
                 lineColor: '#ffffff',
                 lineWidth: 1,
                 marker: {
@@ -168,13 +166,17 @@
         series: [{
             name: '% Growth of Page Views',
             data: getPageViews(analyticsData)
+        },
+                {
+            name: '% Growth of Session Count',
+            data: getSessionCount(analyticsData)
         }]
     });
-        
-       
+
+
     }
 
-    
+
 function getPageViews(data){
     var returnValue = new Array();
     for(var i=0;i<data.length;i++){
@@ -218,9 +220,8 @@ function getCategories(data){
         j$( "#logger" ).text( "Error in reading data" );
         j$( "#container" ).empty();
     });
-    
+
     prepareAndSendRequest("MM");
-    
 
     </script>
 
