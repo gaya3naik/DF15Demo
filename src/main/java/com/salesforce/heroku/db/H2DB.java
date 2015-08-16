@@ -63,19 +63,19 @@ public class H2DB {
 
 
         Map<String, Object> record = Maps.newHashMap();
-        record.put("Date__c", "2015-08-16 11:34:23");
+        record.put("Date__c", "2015-08-16");
         record.put("PageViews__c", 23);
         record.put("SessionCount__c", 45);
         records.add(record);
 
         record = Maps.newHashMap();
-        record.put("Date__c", "2015-07-16 11:34:23");
+        record.put("Date__c", "2015-07-16");
         record.put("PageViews__c", 45);
         record.put("SessionCount__c", 90);
         records.add(record);
 
         record = Maps.newHashMap();
-        record.put("Date__c", "2015-06-16 11:34:23");
+        record.put("Date__c", "2015-06-16");
         record.put("PageViews__c", 34);
         record.put("SessionCount__c", 58);
         records.add(record);
@@ -85,7 +85,7 @@ public class H2DB {
 
 
     public static List<Map<String, Object>> getMovingAverages(List<Map<String, Object>> records) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date;
         Timestamp timestamp;
         DeleteDbFiles.execute("~", "AnalyticsData1", true); // delete and then do the below
