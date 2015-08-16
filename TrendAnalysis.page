@@ -48,6 +48,15 @@
         fetchAnalyticsData(requestObj);
 
     }
+
+    function sortByDate(a, b){
+  var aDate = a.Date__c
+  var bDate = b.Date__c;
+  return ((aDate < bDate) ? -1 : ((aDate > bDate) ? 1 : 0));
+}
+
+
+
     function fetchAnalyticsData(requestObj){
         j$( "#container" ).empty();
         j$( "#logger" ).show();
@@ -63,6 +72,7 @@
             headers:{'Content-type':'application/json'}
         }).done(function(data) {
             analyticsData = data;
+            analyticsData.sort(sortByDate);
             if(requestObj.analysisType == 'MM'){
             	initChart();
             } else if(requestObj.analysisType == 'MA'){
@@ -80,7 +90,8 @@
         j$( "#container" ).show();
         chart = new Highcharts.Chart({
         chart: {
-                            renderTo : 'container'
+                            renderTo : 'container',
+            type: 'spline'
                         },
         title: {
             text: 'Page Views Vs. Session Count',
@@ -89,13 +100,11 @@
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: { // don't display the dummy year
-                month: '%e. %b',
-                year: '%b'
+                month: '%b %Y'
             },
             title: {
                 text: 'Date'
-            },
-            categories: getCategories(analyticsData)
+            }
         },
         yAxis: {
             title: {
@@ -106,6 +115,13 @@
                 width: 1,
                 color: '#808080'
             }]
+        },
+            plotOptions: {
+            spline: {
+                marker: {
+                    enabled: true
+                }
+            }
         },
         legend: {
             layout: 'vertical',
@@ -139,13 +155,11 @@
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: { // don't display the dummy year
-                month: '%e. %b',
-                year: '%b'
+                month: '%b %Y'
             },
             title: {
                 text: 'Date'
-            },
-            categories: getCategories(analyticsData)
+            }
         },
 
         yAxis: {
@@ -178,23 +192,26 @@
 
 
 function getPageViews(data){
+    var dates = getCategories(data);
     var returnValue = new Array();
     for(var i=0;i<data.length;i++){
-        returnValue.push(data[i].PageViews__c);
+        returnValue.push([dates[i],data[i].PageViews__c]);
     }
     return returnValue;
 }
 function getSessionCount(data){
-     var returnValue = new Array();
+    var dates = getCategories(data);
+    var returnValue = new Array();
     for(var i=0;i<data.length;i++){
-        returnValue.push(data[i].SessionCount__c);
+        returnValue.push([dates[i],data[i].SessionCount__c]);
     }
     return returnValue;
 }
 function getCategories(data){
      var returnValue = new Array();
     for(var i=0;i<data.length;i++){
-        returnValue.push(new Date(data[i].Date__c));
+        var x = new Date(data[i].Date__c);
+        returnValue.push(Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()));
     }
     return returnValue;
 }
