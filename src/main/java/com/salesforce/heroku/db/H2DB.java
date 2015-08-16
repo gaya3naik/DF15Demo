@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by gayathri on 12/8/15.
  */
 public class H2DB {
-//    public static void main(String... args) throws Exception {
+    //    public static void main(String... args) throws Exception {
 //        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 //        String dateInString = "7-Jun-2013";
 //        Date date = formatter.parse(dateInString);
@@ -58,46 +58,67 @@ public class H2DB {
 //        stat.close();
 //        conn.close();
 //    }
+    public static void main(String[] args) throws Exception {
+        List records = Lists.newArrayList();
+
+
+        Map<String, Object> record = Maps.newHashMap();
+        record.put("Date__c", "2015-08-16 11:34:23");
+        record.put("PageViews__c", 23);
+        record.put("SessionCount__c", 45);
+        records.add(record);
+
+        record = Maps.newHashMap();
+        record.put("Date__c", "2015-07-16 11:34:23");
+        record.put("PageViews__c", 45);
+        record.put("SessionCount__c", 90);
+        records.add(record);
+
+        record = Maps.newHashMap();
+        record.put("Date__c", "2015-06-16 11:34:23");
+        record.put("PageViews__c", 34);
+        record.put("SessionCount__c", 58);
+        records.add(record);
+
+        getMovingAverages(records);
+    }
+
 
     public static List<Map<String, Object>> getMovingAverages(List<Map<String, Object>> records) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-DD");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date;
         Timestamp timestamp;
-        DeleteDbFiles.execute("~", "#AnalyticsData1", true); // delete and then do the below
+        DeleteDbFiles.execute("~", "AnalyticsData1", true); // delete and then do the below
 
         Class.forName("org.h2.Driver");
-        Connection conn = DriverManager.getConnection("jdbc:h2:~/#AnalyticsData1");
+        Connection conn = DriverManager.getConnection("jdbc:h2:~/AnalyticsData1");
         Statement stat = conn.createStatement();
 
-        stat.execute("CREATE TABLE #AnalyticsData1\n" +
+        stat.execute("CREATE TABLE AnalyticsData1\n" +
                 "( Date Date,\n" +
                 "  PageViews Numeric(13,6),\n" +
                 "  SessionCount Numeric(13,6) \n" +
                 ")");
 
-        for(Map<String, Object> record : records){
+        for (Map<String, Object> record : records) {
             date = formatter.parse(String.valueOf(record.get("Date__c")));
             timestamp = new Timestamp(date.getTime());
-             stat.execute("INSERT INTO #AnalyticsData1 VALUES({ts '"+ timestamp+ "'} ,'" +record.get("PageViews__c")+"', '"+ record.get("SessionCount__c") + "')" );
+            stat.execute("INSERT INTO AnalyticsData1 VALUES({ts '" + timestamp + "'} ,'" + record.get("PageViews__c") + "', '" + record.get("SessionCount__c") + "')");
         }
 
         System.out.print(" Data is inserted");
-        ResultSet rs = stat.executeQuery("SELECT S1.date as date,  AVG(S2.PageViews) AS avg_pv\n" +
-                "FROM #AnalyticsData1 AS S1, #AnalyticsData1 AS S2\n" +
-                "WHERE S2.date\n" +
-                "    BETWEEN DATEADD('DAY', -2, S1.date )\n" +
-                "    AND S1.date\n" +
-                "GROUP BY S1.date\n" +
-                "order by 1");
-        System.out.print("result " + rs);
-        List<Map<String, Object>> resultList= Lists.newArrayList();
+        ResultSet rs = stat.executeQuery("select data1.date, ((data1.pageviews-data2.pageviews)/data2.pageviews)*100 as growth_pageviews, ((data1.sessioncount-data2.sessioncount)/data2.sessioncount)*100 as growth_sessioncount  from analyticsdata1 data1 left outer join analyticsdata1 data2 on data2.date = DATEADD('MONTH', -1, data1.date)");
+        System.out.println("result " + rs);
+        List<Map<String, Object>> resultList = Lists.newArrayList();
 
 
         while (rs.next()) {
             Map<String, Object> resultMap = Maps.newHashMap();
             resultMap.put("Date__c", rs.getDate("date"));
-            resultMap.put("PageViews__c", rs.getDouble("avg_pv"));
-            System.out.println(rs.getDouble("avg_pv"));
+            resultMap.put("PageViews__c", rs.getDouble("growth_pageviews"));
+            resultMap.put("SessionCount__c", rs.getDouble("growth_sessioncount"));
+            System.out.println(rs.getDouble("growth_pageviews"));
+            System.out.println(rs.getDouble("growth_sessioncount"));
             resultList.add(resultMap);
         }
         stat.close();
