@@ -1,15 +1,17 @@
 <apex:page sidebar="false" controller="SFController" >
     <apex:form >
-        <select onChange="prepareAndSendRequest(this.value)" >
-            <option value="MM">Measure VS Measure</option>
-            <option value="MA">Growth Metrics</option>
-            <option value="MD">Multi Dimension Analytics</option>
-        </select>
-    </apex:form>
+                    <select onChange="prepareAndSendRequest(this.value)" >
+                     <option value="MM">Measure VS Measure</option>
+                     <option value="MA">Growth Metrics</option>
+                     <option value="MD">Multi Dimension Analytics</option>
+                   </select>
+</apex:form>
     <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div> <br/>
     <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
+     <div id="container2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-3d.js"></script>
     <style>
 
         .hashtag{
@@ -40,6 +42,7 @@
     <script language="JavaScript">
     var analyticsData = [];
     var appName ="trend-analyzer";
+
     function prepareAndSendRequest(type){
         var requestObj = {};
         requestObj.url = "https://na17.force.com/services/data/v20.0/query";
@@ -71,13 +74,19 @@
             dataType: "json",
             headers:{'Content-type':'application/json'}
         }).done(function(data) {
-            analyticsData = data;
-            analyticsData.sort(sortByDate);
             if(requestObj.analysisType == 'MM'){
-            	initChart();
+                analyticsData = data;
+                analyticsData.sort(sortByDate);
+                initChart();
             } else if(requestObj.analysisType == 'MA'){
+                analyticsData = data;
+                analyticsData.sort(sortByDate);
                 initChart1();
+            } else if(requestObj.analysisType == 'MD'){
+                analyticsData = data;
+                initChart2();
             }
+
             j$( "#logger" ).hide();
         });
         //analyticsData = [{"attributes":{"type":"AnalyticsData__c","url":"/services/data/v20.0/sobjects/AnalyticsData__c/a1To00000016cnNEAQ"},"Id":"a1To00000016cnNEAQ","PageViews__c":87.0,"SessionCount__c":49.0,"Date__c":"2015-08-07"},{"attributes":{"type":"AnalyticsData__c","url":"/services/data/v20.0/sobjects/AnalyticsData__c/a1To00000016cnDEAQ"},"Id":"a1To00000016cnDEAQ","PageViews__c":23.0,"SessionCount__c":58.0,"Date__c":"2015-08-11"}];
@@ -87,6 +96,7 @@
 
     function initChart() {
         j$( "#container1" ).hide();
+        j$( "#container2" ).hide();
         j$( "#container" ).show();
         chart = new Highcharts.Chart({
         chart: {
@@ -143,6 +153,7 @@
     function initChart1() {
          j$( "#container" ).hide();
         j$( "#container1" ).show();
+        j$( "#container2" ).hide();
         chart = new Highcharts.Chart({
         chart: {
                             renderTo : 'container1',
@@ -190,45 +201,135 @@
 
     }
 
+    function initChart2() {
+         j$( "#container" ).hide();
+        j$( "#container1" ).hide();
+        j$( "#container2" ).show();
+        chart = new Highcharts.Chart({
+        chart: {
+            renderTo : 'container2',
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Average Monthly Temperature and Rainfall in Hyderabad, India'
+        },
+        xAxis: [{
+            categories: getMonthlyCategories(analyticsData),
+            crosshair: true
+        }],
+        yAxis: [{ // Primary yAxis
+            labels: {
+                format: '{value}°C',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            title: {
+                text: 'Temperature',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            }
+        }, { // Secondary yAxis
+            title: {
+                text: 'Rainfall',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            labels: {
+                format: '{value} mm',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            opposite: true
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            x: 120,
+            verticalAlign: 'top',
+            y: 100,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        series: [{
+            name: 'Rainfall',
+            type: 'column',
+            yAxis: 1,
+            data: getRainfallData(analyticsData),
+            tooltip: {
+                valueSuffix: ' mm'
+            }
 
-function getPageViews(data){
-    var dates = getCategories(data);
-    var returnValue = new Array();
-    for(var i=0;i<data.length;i++){
-        returnValue.push([dates[i],data[i].PageViews__c]);
-    }
-    return returnValue;
-}
-function getSessionCount(data){
-    var dates = getCategories(data);
-    var returnValue = new Array();
-    for(var i=0;i<data.length;i++){
-        returnValue.push([dates[i],data[i].SessionCount__c]);
-    }
-    return returnValue;
-}
-function getCategories(data){
-     var returnValue = new Array();
-    for(var i=0;i<data.length;i++){
-        var x = new Date(data[i].Date__c);
-        returnValue.push(Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()));
-    }
-    return returnValue;
-}
+        }, {
+            name: 'Temperature',
+            type: 'spline',
+            data: getTemperatureData(analyticsData),
+            tooltip: {
+                valueSuffix: '°C'
+            }
+        }]
+    });
 
-    function populateTweetList(){
-        for(var i = 0; i < tweetData.length; i++){
-            document.getElementById("tweetList").innerHTML += getHTMLForTweet(tweetData[i]);
+
+    }
+
+    function getMonthlyCategories(data){
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            returnValue.push(data[i].Category__c);
         }
+        return returnValue;
     }
 
-    function getHTMLForTweet(tweet){
-        var html ="<table width='80%' class='tweetBlock'><tr><td width='75px'><img src='https://pbs.twimg.com/profile_images/468343244804198401/MKTZ6B9f_bigger.jpeg'/></td><td><table border='0'>";
-        html += "<tr><th align='left'><a class='hashtag' href='https://www.twitter.com/@"+tweet.handle+"' target='blank'>@" + tweet.handle + "</a></th></tr>";
-        html += "<tr><td class='tweetDate'>" + new Date(tweet.date).toUTCString() + "</td></tr>";
-        html += "<tr><td>" + tweet.message.replace(/(^|\W)(#[a-z\d][\w-]*)/ig, '$1<span><a class="hashtag" href="https://www.twitter.com/$2" target="blank">$2</a></span>') + "</td></tr>";
-        html += "</table></tr></td></table><br/>";
-        return html;
+    function getRainfallData(data){
+
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            returnValue.push(data[i].Rainfall__c);
+        }
+        return returnValue;
+    }
+
+    function getTemperatureData(data){
+
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            returnValue.push(data[i].Temperature__c);
+        }
+        return returnValue;
+    }
+
+    function getPageViews(data){
+        var dates = getCategories(data);
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            returnValue.push([dates[i],data[i].PageViews__c]);
+        }
+        return returnValue;
+    }
+
+    function getSessionCount(data){
+        var dates = getCategories(data);
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            returnValue.push([dates[i],data[i].SessionCount__c]);
+        }
+        return returnValue;
+    }
+
+    function getCategories(data){
+         var returnValue = new Array();
+        for(var i=0;i<data.length;i++){
+            var x = new Date(data[i].Date__c);
+            returnValue.push(Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()));
+        }
+        return returnValue;
     }
 
     j$ = jQuery.noConflict();
