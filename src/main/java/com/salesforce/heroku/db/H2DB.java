@@ -14,51 +14,8 @@ import java.util.Map;
  * Created by gayathri on 12/8/15.
  */
 public class H2DB {
-    //    public static void main(String... args) throws Exception {
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-//        String dateInString = "7-Jun-2013";
-//        Date date = formatter.parse(dateInString);
-//        Timestamp timestamp = new Timestamp(date.getTime());//instead of date put your converted date
-//        Timestamp myTimeStamp= timestamp;
-//        DeleteDbFiles.execute("~", "#TestDW", true); // delete and then do the below
-//
-//        Class.forName("org.h2.Driver");
-//        Connection conn = DriverManager.getConnection("jdbc:h2:~/#TestDW");
-//        Statement stat = conn.createStatement();
-//
-//        // this line would initialize the database
-//        // from the SQL script file 'init.sql'
-//        // stat.execute("runscript from 'init.sql'");
-//
-//        stat.execute("CREATE TABLE #TestDW\n" +
-//                "( Date1 Date,\n" +
-//                "  LoadValue Numeric(13,6)\n" +
-//                ")");
-//
-//
-//        stat.execute("INSERT INTO #TestDW VALUES({ts '2012-06-09 18:47:52.69'} , '3.540' )");
-//        stat.execute("INSERT INTO #TestDW VALUES({ts '2012-06-08 18:47:52.69'} , '2.260' )");
-//        stat.execute("INSERT INTO #TestDW VALUES({ts '2012-06-07 18:47:52.69'} , '1.330' )");
-//        stat.execute("INSERT INTO #TestDW VALUES({ts '2012-06-06 18:47:52.69'} , '5.520' )");
-//        System.out.print(" Data is inserted");
-//        ResultSet rs = stat.executeQuery("SELECT S1.date1,  AVG(S2.LoadValue) AS avg_prev_3_days\n" +
-//                        "FROM #TestDW AS S1, #TestDW AS S2\n" +
-//                        "WHERE S2.date1\n" +
-//                        "    BETWEEN DATEADD('DAY', -2, S1.date1 )\n" +
-//                        "    AND S1.date1\n" +
-//                        "GROUP BY S1.date1\n" +
-//                        "order by 1");
-//        System.out.print("result " + rs);
-//        while (rs.next()) {
-//            System.out.println(rs.getDouble("avg_prev_3_days"));
-//        }
-//        while (rs.next()) {
-//            System.out.println(rs.getInt("avg_prev_3_days"));
-//        }
-//        stat.close();
-//        conn.close();
-//    }
-    public static void main(String[] args) throws Exception {
+
+   /* public static void main(String[] args) throws Exception {
         List records = Lists.newArrayList();
 
 
@@ -82,7 +39,7 @@ public class H2DB {
 
         getMovingAverages(records);
     }
-
+*/
 
     public static List<Map<String, Object>> getMovingAverages(List<Map<String, Object>> records) throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -125,4 +82,5 @@ public class H2DB {
         conn.close();
         return resultList;
     }
+
 }

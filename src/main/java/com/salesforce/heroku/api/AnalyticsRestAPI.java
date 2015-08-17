@@ -23,20 +23,27 @@ public class AnalyticsRestAPI {
     @Path("/analysis")
     public List<Map<String, Object>> fetchData(Request request){
         List records = Lists.newArrayList();
-                String query = "SELECT Id,PageViews__c,SessionCount__c, Date__c FROM AnalyticsData__c";
         try {
-
             String analysisType = request.getAnalysisType();
-            Map<String, Object> sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
-            records = (List<Map<String, Object>>) sfResult.get("records");
-            if(analysisType == null || "MM".equalsIgnoreCase(analysisType)) {
-                return records;
-            }
-            else{
-                 return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType, records);
-            }
+            Map<String, Object> sfResult;
 
+            if("MD".equalsIgnoreCase(analysisType)){
+                String query = "SELECT Category__c, Rainfall__c, Temperature__c FROM WeatherInfo__c ORDER BY CreatedDate ASC NULLS FIRST";
 
+                sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
+                records = (List<Map<String, Object>>) sfResult.get("records");
+            }
+            else {
+                String query = "SELECT Id,PageViews__c,SessionCount__c, Date__c FROM AnalyticsData__c";
+
+                sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
+                records = (List<Map<String, Object>>) sfResult.get("records");
+                if (analysisType == null || "MM".equalsIgnoreCase(analysisType)) {
+                    return records;
+                } else {
+                    return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType, records);
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
