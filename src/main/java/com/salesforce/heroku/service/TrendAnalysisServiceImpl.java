@@ -12,8 +12,11 @@ public class TrendAnalysisServiceImpl {
 
     public static List<Map<String, Object>> getAnalyzedTrendData(String analysisType, List<Map<String, Object>>  records) throws Exception {
 
-        if("MA".equalsIgnoreCase(analysisType)){
+        if("MA".equalsIgnoreCase(analysisType)) {
             return H2DB.getMovingAverages(records);
+        }
+        else if("AT".equalsIgnoreCase(analysisType)){
+            return H2DB.getAdvancedTimeline(records);
         }
         return null;
     }

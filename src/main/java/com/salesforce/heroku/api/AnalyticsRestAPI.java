@@ -33,6 +33,12 @@ public class AnalyticsRestAPI {
                 sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
                 records = (List<Map<String, Object>>) sfResult.get("records");
             }
+            else if("AT".equalsIgnoreCase(analysisType)){
+                String query = "SELECT Id,Name,PageViews__c,Revenue__c,SessionCount__c FROM EmployeeInfo__c";
+
+                sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
+                records = (List<Map<String, Object>>) sfResult.get("records");
+            }
             else {
                 String query = "SELECT Id,PageViews__c,SessionCount__c, Date__c FROM AnalyticsData__c";
 
