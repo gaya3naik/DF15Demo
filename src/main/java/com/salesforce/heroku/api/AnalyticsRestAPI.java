@@ -38,6 +38,7 @@ public class AnalyticsRestAPI {
 
                 sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
                 records = (List<Map<String, Object>>) sfResult.get("records");
+                return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType, records);
             }
             else {
                 String query = "SELECT Id,PageViews__c,SessionCount__c, Date__c FROM AnalyticsData__c";
