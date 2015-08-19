@@ -105,7 +105,7 @@ public class H2DB {
         for (Map<String, Object> record : records) {
             date = formatter.parse(String.valueOf(record.get("Date__c")));
             timestamp = new Timestamp(date.getTime());
-            stat.execute("INSERT INTO AnalyticsData2 VALUES({ts '" + timestamp + "'} ,'" + record.get("PageViews__c") + "', '" + record.get("SessionCount__c") + "'," + record.get("Revenue__c") + "'," + record.get("Name") + " )");
+            stat.execute("INSERT INTO AnalyticsData2 VALUES({ts '" + timestamp + "'} ,'" + record.get("PageViews__c") + "', '" + record.get("SessionCount__c") + "','" + record.get("Revenue__c") + "','" + record.get("Name") + "')");
         }
 
         System.out.print(" Data is inserted");
