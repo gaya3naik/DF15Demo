@@ -91,7 +91,7 @@ public class H2DB {
         DeleteDbFiles.execute("~", "AnalyticsData2", true); // delete and then do the below
 
         Class.forName("org.h2.Driver");
-        Connection conn = DriverManager.getConnection("jdbc:h2:~/AnalyticsData1");
+        Connection conn = DriverManager.getConnection("jdbc:h2:~/AnalyticsData2");
         Statement stat = conn.createStatement();
 
         stat.execute("CREATE TABLE AnalyticsData2\n" +
