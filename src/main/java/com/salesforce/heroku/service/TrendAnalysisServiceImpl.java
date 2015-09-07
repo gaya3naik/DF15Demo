@@ -18,6 +18,9 @@ public class TrendAnalysisServiceImpl {
         else if("AT".equalsIgnoreCase(analysisType)){
             return H2DB.getAdvancedTimeline(records);
         }
+        else if("CA".equalsIgnoreCase(analysisType)){
+            return H2DB.getMovingAveragesForCaseData(records);
+        }
         return null;
     }
 }
