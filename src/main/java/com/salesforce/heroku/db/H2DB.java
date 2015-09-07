@@ -129,4 +129,47 @@ public class H2DB {
         return resultList;
     }
 
+
+    public static List<Map<String, Object>> getMovingAveragesForCaseData(List<Map<String, Object>> records) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        Timestamp timestamp;
+        DeleteDbFiles.execute("~", "CaseAnalytics1", true); // delete and then do the below
+
+        Class.forName("org.h2.Driver");
+        Connection conn = DriverManager.getConnection("jdbc:h2:~/AnalyticsData1");
+        Statement stat = conn.createStatement();
+
+        stat.execute("CREATE TABLE CaseAnalytics1\n" +
+                "( Date Date,\n" +
+                "  CasesOpen Numeric(13,6),\n" +
+                "  CasesClosed Numeric(13,6) \n" +
+                ")");
+
+        for (Map<String, Object> record : records) {
+            date = formatter.parse(String.valueOf(record.get("Date__c")));
+            timestamp = new Timestamp(date.getTime());
+            stat.execute("INSERT INTO CaseAnalytics1 VALUES({ts '" + timestamp + "'} ,'" + record.get("Cases_Open__c") + "', '" + record.get("Cases_Closed__c") + "')");
+        }
+
+        System.out.print(" Data is inserted");
+        ResultSet rs = stat.executeQuery("select data1.date, ((data1.CasesOpen-data2.CasesOpen)/data2.CasesOpen)*100 as growth_opencases, ((data1.CasesClosed-data2.CasesClosed)/data2.CasesClosed)*100 as growth_closedcases from CaseAnalytics1 data1 left outer join CaseAnalytics1 data2 on data2.date = DATEADD('MONTH', -1, data1.date)");
+        System.out.println("result " + rs);
+        List<Map<String, Object>> resultList = Lists.newArrayList();
+
+
+        while (rs.next()) {
+            Map<String, Object> resultMap = Maps.newHashMap();
+            resultMap.put("Date__c", rs.getDate("date"));
+            resultMap.put("OpenCases__c", rs.getDouble("growth_opencases"));
+            resultMap.put("ClosedCases__c", rs.getDouble("growth_closedcases"));
+            System.out.println(rs.getDouble("growth_opencases"));
+            System.out.println(rs.getDouble("growth_closedcases"));
+            resultList.add(resultMap);
+        }
+        stat.close();
+        conn.close();
+        return resultList;
+    }
+
 }
