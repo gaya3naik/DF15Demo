@@ -41,7 +41,7 @@ public class AnalyticsRestAPI {
                 return TrendAnalysisServiceImpl.getAnalyzedTrendData(analysisType, records);
             }
             else if("CA".equalsIgnoreCase(analysisType)){
-                String query = "SELECT Cases_Closed__c,Cases_Open__c,Date__c FROM CaseAnalytics__c";
+                String query = "SELECT AssigneeCount__c,CaseNumber,Date__c,Id,Priority,Reason,ResolutionTime__c,Status,Subject,Type FROM Case";
 
                 sfResult = SalesforceQueryRunner.query(query, request.getUrl(), request.getSessionId());
                 records = (List<Map<String, Object>>) sfResult.get("records");
