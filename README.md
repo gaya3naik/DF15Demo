@@ -11,7 +11,7 @@ This session will start with basics of time series analysis and demonstrate how 
 Features :
 This sample application helps in visualizing time series graphs in the following ways.
 
-1) Measures Across Single Time Dimension
+1) Measures across Single Time Dimension
 2) % Growth of Resolution Time / Reopen Count( Measures of a CaseAnalytics custom object)
 3) Surface Graph ( Time Series Graph across multiple dimensions)
 
