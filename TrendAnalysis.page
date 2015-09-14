@@ -1,71 +1,79 @@
 <apex:page sidebar="false" controller="SFController" >
     <apex:form >
                     <select onChange="prepareAndSendRequest(this.value)" >
-                     <option value="MM">Measure VS Measure</option>
+                     <option value="MM">Measure Vs Measure</option>
                      <option value="MA">Growth Metrics</option>
-                     <option value="MD">Multi Dimension Analytics</option>
+                     <option value="AT">Multi Dimension Analytics</option>
                    </select>
 </apex:form>
-    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div> <br/>
-    <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-     <div id="container2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-3d.js"></script>
-    <style>
-
-        .hashtag{
-        color: #F20930;
-        }
-
-        .tweetBlock{
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 12pt;
-        border: 1px;
-        border-style: solid;
-        border-color: #E1E8Ed;
-        background: #F5F8Fa;
-        padding-right : 15px;
-        }
-
-        .tweetDate{
-        font-size: 10pt;
-        }
-
-        #logger{
-        font-size: 12pt;
-        color: #F20930;
-        }
-
-    </style>
+    <div id="containerBlock">
+        <table width="100%">
+            <tr>
+                <td>
+                    <div id="table" style="display: flex; align: center; padding-top: 20px">            
+                    </div>
+                </td>
+                <td width="70%">
+                    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div> 
+                </td>
+            </tr>
+        </table>     
+    </div> <br/>  
+    <div id="containerBlock1">
+        <table width="100%">
+            <tr>
+                <td>
+                    <div id="table1" style="display: flex; align: center; padding-top: 20px">            
+                    </div>
+                </td>
+                <td width="70%">
+                    <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>   
+                </td>
+            </tr>
+        </table>     
+    </div> <br/> 
+    <div id="containerBlock2">
+        <table width="100%">
+            <tr>
+                <td>
+                    <div id="table2" style="display: flex; align: center; padding-top: 20px">            
+                    </div>
+                </td>
+                <td width="70%">
+                    <div id="container2" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
+                </td>
+            </tr>
+        </table>     
+    </div> <br/>     
+       
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-3d.js"></script>   
 
     <script language="JavaScript">
     var analyticsData = [];
     var appName ="trend-analyzer";
-
     function prepareAndSendRequest(type){
         var requestObj = {};
         requestObj.url = "https://na17.force.com/services/data/v20.0/query";
         requestObj.analysisType = (type==null)?"MM":type;
         requestObj.sessionId = "{!$Api.Session_ID}";
         fetchAnalyticsData(requestObj);
-
     }
-
+    
     function sortByDate(a, b){
-  var aDate = a.Date__c
-  var bDate = b.Date__c;
-  return ((aDate < bDate) ? -1 : ((aDate > bDate) ? 1 : 0));
-}
-
-
+          var aDate = a.Date__c
+          var bDate = b.Date__c; 
+          return ((aDate < bDate) ? -1 : ((aDate > bDate) ? 1 : 0));
+    }    
 
     function fetchAnalyticsData(requestObj){
         j$( "#container" ).empty();
         j$( "#logger" ).show();
         j$( "#logger" ).text( "Loading data...");
         initChart();
-
+        
         j$.ajax({
             method: "POST",
             url:"https://"+appName+".herokuapp.com/trends/analysis",
@@ -82,8 +90,9 @@
                 analyticsData = data;
                 analyticsData.sort(sortByDate);
                 initChart1();
-            } else if(requestObj.analysisType == 'MD'){
+            } else if(requestObj.analysisType == 'AT'){
                 analyticsData = data;
+                analyticsData.sort(sortByDate);
                 initChart2();
             }
 
@@ -94,17 +103,21 @@
     }
 
 
-    function initChart() {
+    function initChart() { 
+        j$( "#table" ).html(getTableHtml(analyticsData));  
         j$( "#container1" ).hide();
+        j$( "#table1" ).hide();
         j$( "#container2" ).hide();
+        j$( "#table2" ).hide();
         j$( "#container" ).show();
+        j$( "#table" ).show();
         chart = new Highcharts.Chart({
         chart: {
                             renderTo : 'container',
             type: 'spline'
                         },
         title: {
-            text: 'Page Views Vs. Session Count',
+            text: 'Resolution Time Vs. Reopen Count',
             x: -20 //center
         },
         xAxis: {
@@ -118,7 +131,7 @@
         },
         yAxis: {
             title: {
-                text: 'Page Views/Session Count'
+                text: 'Resolution Time/Reopen Count'
             },
             plotLines: [{
                 value: 0,
@@ -140,28 +153,33 @@
             borderWidth: 0
         },
         series: [{
-            name: 'Page Views',
-            data: getPageViews(analyticsData)
+            name: 'Resolution Time',
+            data: getResolutionTime(analyticsData)
         }, {
-            name: 'Session Count',
-            data:getSessionCount(analyticsData)
+            name: 'Reopen Count',
+            data:getReopenCount(analyticsData)
         }]
     });
-
+    
+        
     }
-
+    
     function initChart1() {
+        j$( "#table1" ).html(getTableHtml_1(analyticsData));  
          j$( "#container" ).hide();
+        j$( "#table" ).hide();
         j$( "#container1" ).show();
+        j$( "#table1" ).show();
         j$( "#container2" ).hide();
+        j$( "#table2" ).hide();
         chart = new Highcharts.Chart({
         chart: {
                             renderTo : 'container1',
             type:'area'
                         },
-
+           
         title: {
-            text: '% Growth of Page Views/Session Count'
+            text: '% Growth of Resolution Time/Reopen Count'
         },
         xAxis: {
             type: 'datetime',
@@ -172,14 +190,14 @@
                 text: 'Date'
             }
         },
-
+        
         yAxis: {
             title: {
-                text: '% Growth of Page Views/Session Count'
+                text: '% Growth of Resolution Time/Reopen Count'
             }
         },
             plotOptions: {
-            area: {
+            area: {                
                 lineColor: '#ffffff',
                 lineWidth: 1,
                 marker: {
@@ -189,61 +207,63 @@
             }
         },
         series: [{
-            name: '% Growth of Page Views',
-            data: getPageViews(analyticsData)
+            name: '% Growth of Resolution Time',
+            data: getResolutionTime(analyticsData)
         },
                 {
-            name: '% Growth of Session Count',
-            data: getSessionCount(analyticsData)
+            name: '% Growth of Reopen Count',
+            data: getReopenCount(analyticsData)
         }]
     });
-
-
+            
+       
     }
 
     function initChart2() {
+        j$( "#table2" ).html(getTableHtml_2(analyticsData));  
          j$( "#container" ).hide();
+        j$( "#table" ).hide();
         j$( "#container1" ).hide();
+        j$( "#table1" ).hide();
         j$( "#container2" ).show();
+        j$( "#table2" ).show();
         chart = new Highcharts.Chart({
         chart: {
             renderTo : 'container2',
             zoomType: 'xy'
         },
         title: {
-            text: 'Average Monthly Temperature and Rainfall in Hyderabad, India'
+            text: 'Advanced Time Line'
         },
         xAxis: [{
-            categories: getMonthlyCategories(analyticsData),
-            crosshair: true
-        }],
-        yAxis: [{ // Primary yAxis
-            labels: {
-                format: '{value}°C',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
+            type: 'datetime',
+            crosshair: true,
+            dateTimeLabelFormats: { // don't display the dummy year
+                month: '%b %Y'
             },
             title: {
-                text: 'Temperature',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
+                text: 'Date'
             }
-        }, { // Secondary yAxis
-            title: {
-                text: 'Rainfall',
-                style: {
-                    color: Highcharts.getOptions().colors[0]
-                }
-            },
+        }],
+        yAxis: [{
+            max: 100,
             labels: {
-                format: '{value} mm',
-                style: {
-                    color: Highcharts.getOptions().colors[0]
-                }
+                enabled: false
             },
-            opposite: true
+            title: {
+                text: ''
+            },
+            gridLineColor: 'rgba(0, 0, 0, 0.07)'
+        }, {
+            allowDecimals: false,
+            max: 15,
+            
+            title: {
+                text: 'Revenue'
+               
+            },
+            opposite: true,
+            gridLineWidth: 0
         }],
         tooltip: {
             shared: true
@@ -258,67 +278,58 @@
             backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
         },
         series: [{
-            name: 'Rainfall',
-            type: 'column',
-            yAxis: 1,
-            data: getRainfallData(analyticsData),
-            tooltip: {
-                valueSuffix: ' mm'
-            }
-
-        }, {
-            name: 'Temperature',
-            type: 'spline',
-            data: getTemperatureData(analyticsData),
-            tooltip: {
-                valueSuffix: '°C'
-            }
+            name: 'Growth of Resolution Time',
+            data: getResolutionTime(analyticsData)
+        },
+        {
+            name: 'Growth of Reopen Count',
+            data: getReopenCount(analyticsData)
+        },       
+        {
+            name: 'Revenue',
+            type: 'area',
+            data: getRevenues(analyticsData)
         }]
     });
-
-
+            
+        
+       
     }
 
-    function getMonthlyCategories(data){
-        var returnValue = new Array();
-        for(var i=0;i<data.length;i++){
-            returnValue.push(data[i].Category__c);
-        }
-        return returnValue;
-    }
+   
 
-    function getRainfallData(data){
-
-        var returnValue = new Array();
-        for(var i=0;i<data.length;i++){
-            returnValue.push(data[i].Rainfall__c);
-        }
-        return returnValue;
-    }
-
-    function getTemperatureData(data){
-
-        var returnValue = new Array();
-        for(var i=0;i<data.length;i++){
-            returnValue.push(data[i].Temperature__c);
-        }
-        return returnValue;
-    }
-
-    function getPageViews(data){
+    function getResolutionTime(data){
         var dates = getCategories(data);
         var returnValue = new Array();
-        for(var i=0;i<data.length;i++){
-            returnValue.push([dates[i],data[i].PageViews__c]);
+        for(var i=0;i<data.length;i++){        
+            returnValue.push([dates[i],data[i].ResolutionTime__c]);
         }
         return returnValue;
     }
 
-    function getSessionCount(data){
+    function getReopenCount(data){
         var dates = getCategories(data);
         var returnValue = new Array();
-        for(var i=0;i<data.length;i++){
-            returnValue.push([dates[i],data[i].SessionCount__c]);
+        for(var i=0;i<data.length;i++){        
+            returnValue.push([dates[i],data[i].Reopencount__c]);
+        }
+        return returnValue;
+    }
+
+    function getNames(data){
+        var dates = getCategories(data);
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){        
+            returnValue.push([dates[i],data[i].Name]);
+        }
+        return returnValue;
+    }
+
+    function getRevenues(data){
+        var dates = getCategories(data);
+        var returnValue = new Array();
+        for(var i=0;i<data.length;i++){        
+            returnValue.push([dates[i],data[i].Revenue__c]);
         }
         return returnValue;
     }
@@ -331,6 +342,53 @@
         }
         return returnValue;
     }
+    
+    function getTableHtml(data){
+        var html = "<table border='1'>";
+        html+= "<tr><th>Date</th><th>Reopen Count</th><th>Resolution Time</th></tr>"
+        for(var i=0;i<data.length;i++){            
+            html+="<tr>";
+            var x = data[i].Date__c;
+            html+="<td>"+x+"</td>";
+            html+="<td>"+data[i].Reopencount__c+"</td>";
+            html+="<td>"+data[i].ResolutionTime__c+"</td>";            
+            html+="</tr>";            
+        }     
+        html+="</table>";
+        return html;
+     }
+
+    function getTableHtml_1(data){
+        var html = "<table border='1'>";
+        html+= "<tr><th>Date</th><th>Growth (Reopen Count)</th><th>Growth (Resolution Time)</th></tr>"
+        for(var i=0;i<data.length;i++){            
+            html+="<tr>";
+            var x = data[i].Date__c;
+            html+="<td>"+x+"</td>";
+            html+="<td>"+data[i].ReopenCount__c+"</td>";
+            html+="<td>"+data[i].ResolutionTime__c+"</td>";            
+            html+="</tr>";            
+        }     
+        html+="</table>";
+        return html;
+     }
+    
+    function getTableHtml_2(data){
+        var html = "<table border='1'>";
+        html+= "<tr><th>Date</th><th>Growth (Reopen Count)</th><th>Growth (Resolution Time)</th><th>Revenue</th></tr>"
+        for(var i=0;i<data.length;i++){            
+            html+="<tr>";
+            var x = data[i].Date__c;
+            html+="<td>"+x+"</td>";
+            html+="<td>"+data[i].SessionCount__c+"</td>";
+            html+="<td>"+data[i].PageViews__c+"</td>";   
+            html+="<td>"+data[i].Revenue__c+"</td>"
+            html+="</tr>";            
+        }     
+        html+="</table>";
+        return html;
+     }
+    
 
     j$ = jQuery.noConflict();
     j$( document ).ajaxError(function() {
@@ -338,9 +396,9 @@
         j$( "#logger" ).text( "Error in reading data" );
         j$( "#container" ).empty();
     });
-
+    
     prepareAndSendRequest("MM");
-
+    
     </script>
 
 </apex:page>
