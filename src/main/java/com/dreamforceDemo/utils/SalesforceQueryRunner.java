@@ -38,7 +38,7 @@ public class SalesforceQueryRunner {
         }
 
         String str = response.readEntity(String.class);
-        System.debug('str is '+str);
+//        System.debug('str is '+str);
         return readMap(str, Object.class, Object.class);
     }
 
