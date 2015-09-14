@@ -1,7 +1,7 @@
 <apex:page sidebar="false" controller="SFController" >
     <apex:form >
                     <select onChange="prepareAndSendRequest(this.value)" >
-                     <option value="MM">Measure Vs Measure</option>
+                     <option value="MM">Measure VS Measure</option>
                      <option value="MA">Growth Metrics</option>
                      <option value="AT">Multi Dimension Analytics</option>
                    </select>
@@ -311,7 +311,7 @@
         var dates = getCategories(data);
         var returnValue = new Array();
         for(var i=0;i<data.length;i++){        
-            returnValue.push([dates[i],data[i].Reopencount__c]);
+            returnValue.push([dates[i],data[i].ReopenCount__c]);
         }
         return returnValue;
     }
@@ -350,7 +350,7 @@
             html+="<tr>";
             var x = data[i].Date__c;
             html+="<td>"+x+"</td>";
-            html+="<td>"+data[i].Reopencount__c+"</td>";
+            html+="<td>"+data[i].ReopenCount__c+"</td>";
             html+="<td>"+data[i].ResolutionTime__c+"</td>";            
             html+="</tr>";            
         }     
