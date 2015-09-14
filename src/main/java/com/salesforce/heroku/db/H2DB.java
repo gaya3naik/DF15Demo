@@ -53,18 +53,18 @@ public class H2DB {
 
         stat.execute("CREATE TABLE AnalyticsData1\n" +
                 "( Date Date,\n" +
-                "  PageViews Numeric(13,6),\n" +
-                "  SessionCount Numeric(13,6) \n" +
+                "  ResolutionTime Numeric(13,6),\n" +
+                "  ReopenCount Numeric(13,6) \n" +
                 ")");
 
         for (Map<String, Object> record : records) {
             date = formatter.parse(String.valueOf(record.get("Date__c")));
             timestamp = new Timestamp(date.getTime());
-            stat.execute("INSERT INTO AnalyticsData1 VALUES({ts '" + timestamp + "'} ,'" + record.get("PageViews__c") + "', '" + record.get("SessionCount__c") + "')");
+            stat.execute("INSERT INTO AnalyticsData1 VALUES({ts '" + timestamp + "'} ,'" + record.get("ResolutionTime__c") + "', '" + record.get("ReopenCount__c") + "')");
         }
 
         System.out.print(" Data is inserted");
-        ResultSet rs = stat.executeQuery("select data1.date, ((data1.pageviews-data2.pageviews)/data2.pageviews)*100 as growth_pageviews, ((data1.sessioncount-data2.sessioncount)/data2.sessioncount)*100 as growth_sessioncount  from analyticsdata1 data1 left outer join analyticsdata1 data2 on data2.date = DATEADD('MONTH', -1, data1.date)");
+        ResultSet rs = stat.executeQuery("select data1.date, ((data1.ResolutionTime-data2.ResolutionTime)/data2.ResolutionTime)*100 as growth_rt, ((data1.ReopenCount-data2.ReopenCount)/data2.ReopenCount)*100 as growth_rc  from analyticsdata1 data1 left outer join analyticsdata1 data2 on data2.date = DATEADD('MONTH', -1, data1.date)");
         System.out.println("result " + rs);
         List<Map<String, Object>> resultList = Lists.newArrayList();
 
@@ -72,10 +72,10 @@ public class H2DB {
         while (rs.next()) {
             Map<String, Object> resultMap = Maps.newHashMap();
             resultMap.put("Date__c", rs.getDate("date"));
-            resultMap.put("PageViews__c", rs.getDouble("growth_pageviews"));
-            resultMap.put("SessionCount__c", rs.getDouble("growth_sessioncount"));
-            System.out.println(rs.getDouble("growth_pageviews"));
-            System.out.println(rs.getDouble("growth_sessioncount"));
+            resultMap.put("ResolutionTime__c", rs.getDouble("growth_rt"));
+            resultMap.put("ReopenCount__c", rs.getDouble("growth_rc"));
+            System.out.println(rs.getDouble("growth_rt"));
+            System.out.println(rs.getDouble("growth_rc"));
             resultList.add(resultMap);
         }
         stat.close();
