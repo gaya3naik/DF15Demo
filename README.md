@@ -12,11 +12,11 @@ Features :
 This sample application helps in visualizing time series graphs in the following ways.
 
 1) Measures Across Single Time Dimension
-2) % Growth of Page Views / Session Count ( Measures of a Custom Object)
+2) % Growth of Resolution Time / Reopen Count( Measures of a CaseAnalytics custom object)
 3) Surface Graph ( Time Series Graph across multiple dimensions)
 
-Heroku App uses H2DB for in memory joins and complex calculations on the date returned by Salesforce REST APIs.
-This data is then show in the form of Time Line Graphs using HighCharts.js library.
+Heroku App uses H2 database for in memory joins and complex calculations on the data returned by Salesforce REST APIs.
+This data is drawn using Timeline graphs using HighCharts.js library.
 
 
 Pre-requisites
@@ -26,6 +26,6 @@ Heroku Account
 Java 7 SE Development Kit (Preferably Oracle Java)
 Maven 3+
 
-NOTE : This is a sample app developed to present at Dreamforce this year! For More Details -[Click here!](https://www.salesforce.com/dreamforce/DF15/)
+NOTE : This is a sample app developed to present at Dreamforce this year! For More Details -[Click here!](https://success.salesforce.com/apex/Ev_Sessions?eventId=a1Q30000000DHQlEAO#/session/a2q300000019BFyAAM)
 
 
